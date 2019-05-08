@@ -2,6 +2,8 @@ SET SESSION FOREIGN_KEY_CHECKS=0;
 
 /* Drop Tables */
 
+DROP TABLE IF EXISTS js_gen_table_column;
+DROP TABLE IF EXISTS js_gen_table;
 DROP TABLE IF EXISTS js_sys_company_office;
 DROP TABLE IF EXISTS js_sys_employee_post;
 DROP TABLE IF EXISTS js_sys_user_data_scope;
@@ -36,6 +38,59 @@ DROP TABLE IF EXISTS js_sys_role;
 
 
 /* Create Tables */
+
+-- 代码生成表
+CREATE TABLE js_gen_table
+(
+	table_name varchar(64) NOT NULL COMMENT '表名',
+	class_name varchar(100) NOT NULL COMMENT '实体类名称',
+	comments varchar(500) NOT NULL COMMENT '表说明',
+	parent_table_name varchar(64) COMMENT '关联父表的表名',
+	parent_table_fk_name varchar(64) COMMENT '本表关联父表的外键名',
+	data_source_name varchar(64) COMMENT '数据源名称',
+	tpl_category varchar(200) COMMENT '使用的模板',
+	package_name varchar(500) COMMENT '生成包路径',
+	module_name varchar(30) COMMENT '生成模块名',
+	sub_module_name varchar(30) COMMENT '生成子模块名',
+	function_name varchar(200) COMMENT '生成功能名',
+	function_name_simple varchar(50) COMMENT '生成功能名（简写）',
+	function_author varchar(50) COMMENT '生成功能作者',
+	gen_base_dir varchar(1000) COMMENT '生成基础路径',
+	options varchar(1000) COMMENT '其它生成选项',
+	create_by varchar(64) NOT NULL COMMENT '创建者',
+	create_date datetime NOT NULL COMMENT '创建时间',
+	update_by varchar(64) NOT NULL COMMENT '更新者',
+	update_date datetime NOT NULL COMMENT '更新时间',
+	remarks varchar(500) COMMENT '备注信息',
+	PRIMARY KEY (table_name)
+) COMMENT = '代码生成表';
+
+
+-- 代码生成表列
+CREATE TABLE js_gen_table_column
+(
+	id varchar(64) NOT NULL COMMENT '编号',
+	table_name varchar(64) NOT NULL COMMENT '表名',
+	column_name varchar(64) NOT NULL COMMENT '列名',
+	column_sort decimal(10) COMMENT '列排序（升序）',
+	column_type varchar(100) NOT NULL COMMENT '类型',
+	column_label varchar(50) COMMENT '列标签名',
+	comments varchar(500) NOT NULL COMMENT '列备注说明',
+	attr_name varchar(200) NOT NULL COMMENT '类的属性名',
+	attr_type varchar(200) NOT NULL COMMENT '类的属性类型',
+	is_pk char(1) COMMENT '是否主键',
+	is_null char(1) COMMENT '是否可为空',
+	is_insert char(1) COMMENT '是否插入字段',
+	is_update char(1) COMMENT '是否更新字段',
+	is_list char(1) COMMENT '是否列表字段',
+	is_query char(1) COMMENT '是否查询字段',
+	query_type varchar(200) COMMENT '查询方式',
+	is_edit char(1) COMMENT '是否编辑字段',
+	show_type varchar(200) COMMENT '表单类型',
+	options varchar(1000) COMMENT '其它生成选项',
+	PRIMARY KEY (id)
+) COMMENT = '代码生成表列';
+
 
 -- 行政区划
 CREATE TABLE js_sys_area
@@ -81,8 +136,8 @@ CREATE TABLE js_sys_company
 	update_by varchar(64) NOT NULL COMMENT '更新者',
 	update_date datetime NOT NULL COMMENT '更新时间',
 	remarks varchar(500) COMMENT '备注信息',
-	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '归属集团Code',
-	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '归属集团Name',
+	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '租户代码',
+	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '租户名称',
 	extend_s1 varchar(500) COMMENT '扩展 String 1',
 	extend_s2 varchar(500) COMMENT '扩展 String 2',
 	extend_s3 varchar(500) COMMENT '扩展 String 3',
@@ -122,7 +177,7 @@ CREATE TABLE js_sys_config
 	id varchar(64) NOT NULL COMMENT '编号',
 	config_name varchar(100) NOT NULL COMMENT '名称',
 	config_key varchar(100) NOT NULL COMMENT '参数键',
-	config_value varchar(1000) NOT NULL COMMENT '参数值',
+	config_value varchar(1000) COMMENT '参数值',
 	is_sys char(1) NOT NULL COMMENT '系统内置（1是 0否）',
 	create_by varchar(64) NOT NULL COMMENT '创建者',
 	create_date datetime NOT NULL COMMENT '创建时间',
@@ -157,8 +212,8 @@ CREATE TABLE js_sys_dict_data
 	update_by varchar(64) NOT NULL COMMENT '更新者',
 	update_date datetime NOT NULL COMMENT '更新时间',
 	remarks varchar(500) COMMENT '备注信息',
-	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '归属集团Code',
-	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '归属集团Name',
+	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '租户代码',
+	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '租户名称',
 	extend_s1 varchar(500) COMMENT '扩展 String 1',
 	extend_s2 varchar(500) COMMENT '扩展 String 2',
 	extend_s3 varchar(500) COMMENT '扩展 String 3',
@@ -196,8 +251,7 @@ CREATE TABLE js_sys_dict_type
 	update_by varchar(64) NOT NULL COMMENT '更新者',
 	update_date datetime NOT NULL COMMENT '更新时间',
 	remarks varchar(500) COMMENT '备注信息',
-	PRIMARY KEY (id),
-	UNIQUE (dict_type)
+	PRIMARY KEY (id)
 ) COMMENT = '字典类型表';
 
 
@@ -217,8 +271,8 @@ CREATE TABLE js_sys_employee
 	update_by varchar(64) NOT NULL COMMENT '更新者',
 	update_date datetime NOT NULL COMMENT '更新时间',
 	remarks varchar(500) COMMENT '备注信息',
-	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '归属集团Code',
-	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '归属集团Name',
+	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '租户代码',
+	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '租户名称',
 	PRIMARY KEY (emp_code)
 ) COMMENT = '员工表';
 
@@ -240,9 +294,9 @@ CREATE TABLE js_sys_file_entity
 	file_path varchar(1000) NOT NULL COMMENT '文件相对路径',
 	file_content_type varchar(200) NOT NULL COMMENT '文件内容类型',
 	file_extension varchar(100) NOT NULL COMMENT '文件后缀扩展名',
-	file_size decimal(38) NOT NULL COMMENT '文件大小(单位B)',
-	PRIMARY KEY (file_id),
-	UNIQUE (file_md5)
+	file_size decimal(31) NOT NULL COMMENT '文件大小(单位B)',
+	file_meta varchar(255) COMMENT '文件信息(JSON格式)',
+	PRIMARY KEY (file_id)
 ) COMMENT = '文件实体表';
 
 
@@ -275,6 +329,7 @@ CREATE TABLE js_sys_job
 	cron_expression varchar(255) NOT NULL COMMENT 'Cron执行表达式',
 	misfire_instruction decimal(1) NOT NULL COMMENT '计划执行错误策略',
 	concurrent char(1) NOT NULL COMMENT '是否并发执行',
+	instance_name varchar(64) DEFAULT 'JeeSiteScheduler' NOT NULL COMMENT '集群的实例名字',
 	status char(1) NOT NULL COMMENT '状态（0正常 1删除 2暂停）',
 	create_by varchar(64) NOT NULL COMMENT '创建者',
 	create_date datetime NOT NULL COMMENT '创建时间',
@@ -341,8 +396,8 @@ CREATE TABLE js_sys_log
 	device_name varchar(100) COMMENT '设备名称/操作系统',
 	browser_name varchar(100) COMMENT '浏览器名称',
 	execute_time decimal(19) COMMENT '执行时间',
-	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '归属集团Code',
-	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '归属集团Name',
+	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '租户代码',
+	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '租户名称',
 	PRIMARY KEY (id)
 ) COMMENT = '操作日志表';
 
@@ -426,14 +481,14 @@ CREATE TABLE js_sys_msg_inner
 	content_level char(1) NOT NULL COMMENT '内容级别（1普通 2一般 3紧急）',
 	content_type char(1) COMMENT '内容类型（1公告 2新闻 3会议 4其它）',
 	msg_content text NOT NULL COMMENT '消息内容',
-	receive_type char(1) NOT NULL COMMENT '接受者类型（1用户 2部门 3角色 4岗位）',
-	receive_codes text NOT NULL COMMENT '接受者字符串',
-	receive_names text NOT NULL COMMENT '接受者名称字符串',
-	send_user_code varchar(64) NOT NULL COMMENT '发送者用户编码',
-	send_user_name varchar(100) NOT NULL COMMENT '发送者用户姓名',
-	send_date datetime NOT NULL COMMENT '发送时间',
+	receive_type char(1) NOT NULL COMMENT '接受者类型（0全部 1用户 2部门 3角色 4岗位）',
+	receive_codes text COMMENT '接受者字符串',
+	receive_names text COMMENT '接受者名称字符串',
+	send_user_code varchar(64) COMMENT '发送者用户编码',
+	send_user_name varchar(100) COMMENT '发送者用户姓名',
+	send_date datetime COMMENT '发送时间',
 	is_attac char(1) COMMENT '是否有附件',
-	notify_types varchar(100) NOT NULL COMMENT '通知类型（PC APP 短信 邮件 微信）多选',
+	notify_types varchar(100) COMMENT '通知类型（PC APP 短信 邮件 微信）多选',
 	status char(1) NOT NULL COMMENT '状态（0正常 1删除 4审核 5驳回 9草稿）',
 	create_by varchar(64) NOT NULL COMMENT '创建者',
 	create_date datetime NOT NULL COMMENT '创建时间',
@@ -449,9 +504,9 @@ CREATE TABLE js_sys_msg_inner_record
 (
 	id varchar(64) NOT NULL COMMENT '编号',
 	msg_inner_id varchar(64) NOT NULL COMMENT '所属消息',
-	receive_user_code varchar(64) COMMENT '接受者用户编码',
+	receive_user_code varchar(64) NOT NULL COMMENT '接受者用户编码',
 	receive_user_name varchar(100) NOT NULL COMMENT '接受者用户姓名',
-	read_status char(1) NOT NULL COMMENT '读取状态（0未送达 1未读 2已读）',
+	read_status char(1) NOT NULL COMMENT '读取状态（0未送达 1已读 2未读）',
 	read_date datetime COMMENT '阅读时间',
 	is_star char(1) COMMENT '是否标星',
 	PRIMARY KEY (id)
@@ -480,9 +535,9 @@ CREATE TABLE js_sys_msg_push
 	push_return_msg_id varchar(200) COMMENT '推送返回消息编号',
 	push_return_content text COMMENT '推送返回的内容信息',
 	push_status char(1) COMMENT '推送状态（0未推送 1成功  2失败）',
-	push_date date COMMENT '推送时间',
-	read_status char(1) COMMENT '读取状态（0未送达 1未读 2已读）',
-	read_date date COMMENT '读取时间',
+	push_date datetime COMMENT '推送时间',
+	read_status char(1) COMMENT '读取状态（0未送达 1已读 2未读）',
+	read_date datetime COMMENT '读取时间',
 	PRIMARY KEY (id)
 ) COMMENT = '消息推送表';
 
@@ -509,9 +564,9 @@ CREATE TABLE js_sys_msg_pushed
 	push_return_code varchar(200) COMMENT '推送返回结果码',
 	push_return_msg_id varchar(200) COMMENT '推送返回消息编号',
 	push_status char(1) COMMENT '推送状态（0未推送 1成功  2失败）',
-	push_date date COMMENT '推送时间',
-	read_status char(1) COMMENT '读取状态（0未送达 1未读 2已读）',
-	read_date date COMMENT '读取时间',
+	push_date datetime COMMENT '推送时间',
+	read_status char(1) COMMENT '读取状态（0未送达 1已读 2未读）',
+	read_date datetime COMMENT '读取时间',
 	PRIMARY KEY (id)
 ) COMMENT = '消息已推送表';
 
@@ -561,8 +616,8 @@ CREATE TABLE js_sys_office
 	update_by varchar(64) NOT NULL COMMENT '更新者',
 	update_date datetime NOT NULL COMMENT '更新时间',
 	remarks varchar(500) COMMENT '备注信息',
-	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '归属集团Code',
-	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '归属集团Name',
+	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '租户代码',
+	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '租户名称',
 	extend_s1 varchar(500) COMMENT '扩展 String 1',
 	extend_s2 varchar(500) COMMENT '扩展 String 2',
 	extend_s3 varchar(500) COMMENT '扩展 String 3',
@@ -600,8 +655,8 @@ CREATE TABLE js_sys_post
 	update_by varchar(64) NOT NULL COMMENT '更新者',
 	update_date datetime NOT NULL COMMENT '更新时间',
 	remarks varchar(500) COMMENT '备注信息',
-	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '归属集团Code',
-	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '归属集团Name',
+	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '租户代码',
+	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '租户名称',
 	PRIMARY KEY (post_code)
 ) COMMENT = '员工岗位表';
 
@@ -622,8 +677,8 @@ CREATE TABLE js_sys_role
 	update_by varchar(64) NOT NULL COMMENT '更新者',
 	update_date datetime NOT NULL COMMENT '更新时间',
 	remarks varchar(500) COMMENT '备注信息',
-	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '归属集团Code',
-	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '归属集团Name',
+	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '租户代码',
+	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '租户名称',
 	PRIMARY KEY (role_code)
 ) COMMENT = '角色表';
 
@@ -688,8 +743,8 @@ CREATE TABLE js_sys_user
 	update_by varchar(64) NOT NULL COMMENT '更新者',
 	update_date datetime NOT NULL COMMENT '更新时间',
 	remarks varchar(500) COMMENT '备注信息',
-	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '归属集团Code',
-	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '归属集团Name',
+	corp_code varchar(64) DEFAULT '0' NOT NULL COMMENT '租户代码',
+	corp_name varchar(100) DEFAULT 'JeeSite' NOT NULL COMMENT '租户名称',
 	extend_s1 varchar(500) COMMENT '扩展 String 1',
 	extend_s2 varchar(500) COMMENT '扩展 String 2',
 	extend_s3 varchar(500) COMMENT '扩展 String 3',
@@ -737,6 +792,8 @@ CREATE TABLE js_sys_user_role
 
 /* Create Indexes */
 
+CREATE INDEX idx_gen_table_ptn ON js_gen_table (parent_table_name ASC);
+CREATE INDEX idx_gen_table_column_tn ON js_gen_table_column (table_name ASC);
 CREATE INDEX idx_sys_area_pc ON js_sys_area (parent_code ASC);
 CREATE INDEX idx_sys_area_ts ON js_sys_area (tree_sort ASC);
 CREATE INDEX idx_sys_area_status ON js_sys_area (status ASC);
@@ -749,7 +806,7 @@ CREATE INDEX idx_sys_company_status ON js_sys_company (status ASC);
 CREATE INDEX idx_sys_company_vc ON js_sys_company (view_code ASC);
 CREATE INDEX idx_sys_company_pcs ON js_sys_company (parent_codes ASC);
 CREATE INDEX idx_sys_company_tss ON js_sys_company (tree_sorts ASC);
-CREATE INDEX idx_sys_config_key ON js_sys_config (config_key ASC);
+CREATE UNIQUE INDEX idx_sys_config_key ON js_sys_config (config_key ASC);
 CREATE INDEX idx_sys_dict_data_cc ON js_sys_dict_data (corp_code ASC);
 CREATE INDEX idx_sys_dict_data_dt ON js_sys_dict_data (dict_type ASC);
 CREATE INDEX idx_sys_dict_data_pc ON js_sys_dict_data (parent_code ASC);
@@ -798,6 +855,7 @@ CREATE INDEX idx_sys_menu_tss ON js_sys_menu (tree_sorts ASC);
 CREATE INDEX idx_sys_menu_sc ON js_sys_menu (sys_code ASC);
 CREATE INDEX idx_sys_menu_is ON js_sys_menu (is_show ASC);
 CREATE INDEX idx_sys_menu_mcs ON js_sys_menu (module_codes ASC);
+CREATE INDEX idx_sys_menu_wt ON js_sys_menu (weight ASC);
 CREATE INDEX idx_sys_module_status ON js_sys_module (status ASC);
 CREATE INDEX idx_sys_msg_inner_cb ON js_sys_msg_inner (create_by ASC);
 CREATE INDEX idx_sys_msg_inner_status ON js_sys_msg_inner (status ASC);
@@ -805,7 +863,6 @@ CREATE INDEX idx_sys_msg_inner_cl ON js_sys_msg_inner (content_level ASC);
 CREATE INDEX idx_sys_msg_inner_sc ON js_sys_msg_inner (send_user_code ASC);
 CREATE INDEX idx_sys_msg_inner_sd ON js_sys_msg_inner (send_date ASC);
 CREATE INDEX idx_sys_msg_inner_r_mi ON js_sys_msg_inner_record (msg_inner_id ASC);
-CREATE INDEX idx_sys_msg_inner_r_rc ON js_sys_msg_inner_record (receive_user_code ASC);
 CREATE INDEX idx_sys_msg_inner_r_ruc ON js_sys_msg_inner_record (receive_user_code ASC);
 CREATE INDEX idx_sys_msg_inner_r_status ON js_sys_msg_inner_record (read_status ASC);
 CREATE INDEX idx_sys_msg_inner_r_star ON js_sys_msg_inner_record (is_star ASC);

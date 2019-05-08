@@ -12,7 +12,7 @@ import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.jeesite.common.datasource.DataSourceHolder;
+import com.jeesite.common.lang.ByteUtils;
 import com.jeesite.common.lang.DateUtils;
 import com.jeesite.common.lang.TimeUtils;
 import com.jeesite.common.service.BaseService;
@@ -22,12 +22,12 @@ import com.jeesite.modules.sys.utils.UserUtils;
 /**
  * 日志拦截器
  * @author ThinkGem
- * @version 2014-8-19
+ * @version 2018-08-11
  */
 public class LogInterceptor extends BaseService implements HandlerInterceptor {
 
 	private static final ThreadLocal<Long> startTimeThreadLocal =
-			new NamedThreadLocal<Long>("ThreadLocal StartTime");
+			new NamedThreadLocal<Long>("LogInterceptor StartTime");
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
@@ -56,19 +56,16 @@ public class LogInterceptor extends BaseService implements HandlerInterceptor {
 		long endTime = System.currentTimeMillis(); 	// 2、结束时间
 		long executeTime = endTime - beginTime;	// 3、获取执行时间
 		startTimeThreadLocal.remove(); // 用完之后销毁线程变量数据
-
-		// 恢复多数据源参数，使用默认数据源
-		DataSourceHolder.clearDataSourceName();
-
+		
 		// 保存日志
 		LogUtils.saveLog(UserUtils.getUser(), request, handler, ex, null, null, executeTime);
 		
 		// 打印JVM信息。
 		if (logger.isDebugEnabled()){
-	        logger.debug("计时结束: {}  用时: {}  URI: {}  最大内存: {}m  已分配内存: {}m  已分配内存中的剩余空间: {}m  最大可用内存: {}m",
-	        		DateUtils.formatDate(endTime, "hh:mm:ss.SSS"), TimeUtils.formatDateAgo(executeTime),
-					request.getRequestURI(), Runtime.getRuntime().maxMemory()/1024/1024, Runtime.getRuntime().totalMemory()/1024/1024, Runtime.getRuntime().freeMemory()/1024/1024, 
-					(Runtime.getRuntime().maxMemory()-Runtime.getRuntime().totalMemory()+Runtime.getRuntime().freeMemory())/1024/1024); 
+			Runtime runtime = Runtime.getRuntime();
+	        logger.debug("计时结束: {}  用时: {}  URI: {}  总内存: {}  已用内存: {}",
+	        		DateUtils.formatDate(endTime, "hh:mm:ss.SSS"), TimeUtils.formatDateAgo(executeTime), request.getRequestURI(), 
+					ByteUtils.formatByteSize(runtime.totalMemory()), ByteUtils.formatByteSize(runtime.totalMemory()-runtime.freeMemory())); 
 		}
 		
 	}

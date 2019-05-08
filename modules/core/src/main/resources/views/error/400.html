@@ -1,5 +1,5 @@
-<% 
-@servlet.getResponse().setStatus(403);
+<%/* Copyright (c) 2013-Now http://jeesite.com All rights reserved. */
+@servlet.getResponse().setStatus(400);
 
 var message = @ObjectUtils.toString(@request.getAttribute('message'));
 
@@ -32,7 +32,7 @@ if (isBlank(message)){
 
 // 如果是异步请求或是手机端，则直接返回信息
 if (@ServletUtils.isAjaxRequest(request)) {
-	print(message);
+	print(@ServletUtils.renderResult(@Global.FALSE, message));
 }
 
 // 输出异常信息页面
@@ -49,8 +49,8 @@ else {
 			class="fa fa-reply-all"></i> ${text('sys.error.returnButton')}</button>
 	</div>
 	<div class="copyright">
-		<% var productName = @Global.getConfig('productName'), productVersion = @Global.getConfig('productVersion'); %>
-		版权所有 &copy; ${@DateUtils.getYear()} ${productName} - Powered By <a href="http://jeesite.com">JeeSite</a>.
+		&copy; ${@DateUtils.getYear()} ${@Global.getConfig('productName')} - Powered By <a
+			href="http://jeesite.com">JeeSite ${@Global.getProperty('jeesiteVersion')}</a>
 	</div>
 </div>
 <% } %>

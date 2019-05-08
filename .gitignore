@@ -2,7 +2,9 @@
 **/target
 **/webapp/userfiles
 **/WEB-INF/classes
-**/logs/log*.log
+**/logs/*.log*
+*.epoch
+*.lic
 
 .classpath
 .project
@@ -11,7 +13,6 @@
 *.ipr
 *.iml
 *.iws
-*.lic
 
 .DS_Store
 Thumbs.db
